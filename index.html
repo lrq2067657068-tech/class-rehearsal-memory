@@ -270,8 +270,38 @@ textarea{min-height:120px;resize:vertical}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 
 .gallery{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:20px;margin-top:30px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:20px;
+  margin-top:30px;
+}
+
+/* 照片墙横向胶片滚动 */
+#photoGallery.photo-scroll{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:12px 3px 22px;
+  scroll-behavior:smooth;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:thin;
+  scrollbar-color:var(--gold) #192a3d;
+}
+
+#photoGallery.photo-scroll .media-card{
+  flex:0 0 340px;
+  scroll-snap-align:start;
+}
+
+#photoGallery.photo-scroll .media-frame{
+  height:245px;
+}
+
+@media(max-width:760px){
+  #photoGallery.photo-scroll .media-card{
+    flex:0 0 78vw;
+  }
 }
 .media-card{
   min-width:0;position:relative;background:#192a3d;
@@ -645,6 +675,7 @@ let currentUser = null;
 let photoItems = [];
 let slideIndex = 0;
 let slideTimer = null;
+  let photoScrollTimer = null;
 
 function toast(message){
   const el=document.getElementById('toast');
@@ -896,9 +927,36 @@ async function loadFiles(type){
     requestAnimationFrame(()=>card.classList.add('visible'));
   }
 
-  if(type==='image')updateFeatured();
+ if(type==='image'){
+  startPhotoScroll();
+  updateFeatured();
 }
+}
+// 照片墙自动横向滚动
+function startPhotoScroll(){
+  const gallery=document.getElementById('photoGallery');
 
+  if(photoScrollTimer){
+    clearInterval(photoScrollTimer);
+    photoScrollTimer=null;
+  }
+
+  gallery.classList.add('photo-scroll');
+
+  if(gallery.scrollWidth<=gallery.clientWidth)return;
+
+  photoScrollTimer=setInterval(()=>{
+    if(gallery.matches(':hover'))return;
+
+    const maxScroll=gallery.scrollWidth-gallery.clientWidth;
+
+    if(gallery.scrollLeft>=maxScroll-2){
+      gallery.scrollTo({left:0,behavior:'smooth'});
+    }else{
+      gallery.scrollLeft+=1;
+    }
+  },35);
+}
 // ====================================
 // ⑥ 首页自动轮播照片
 // ====================================
