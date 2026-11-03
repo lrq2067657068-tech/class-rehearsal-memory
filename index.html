@@ -1,1 +1,518 @@
 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>班级排练纪念馆</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --blue:#244e70;
+  --deep:#142d46;
+  --light:#e8f0f6;
+  --gold:#d6b77a;
+  --white:#f8fafc;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#101e2c;
+  color:var(--white);
+  font-family:"Microsoft YaHei",sans-serif;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.hero{
+  min-height:490px;
+  padding:30px 8%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  background:
+  linear-gradient(90deg,rgba(9,25,43,.94),rgba(20,45,70,.55)),
+  url("https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1600")
+  center/cover;
+}
+.top{
+  position:absolute;top:25px;left:8%;right:8%;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.logo{letter-spacing:4px;color:#d6b77a;font-size:14px}
+.hero h1{
+  font-family:Georgia,serif;
+  font-size:clamp(38px,7vw,76px);
+  letter-spacing:5px;
+  margin:60px 0 15px;
+}
+.hero p{color:#d4dce5;line-height:2;max-width:500px}
+.hero small{color:var(--gold);letter-spacing:5px}
+.nav{
+  position:sticky;top:0;z-index:10;
+  display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+  padding:15px;background:rgba(15,32,49,.96);
+  border-bottom:1px solid #30475c;
+}
+.nav button{
+  color:#d8e2eb;background:none;border:0;
+  padding:10px 17px;letter-spacing:2px;
+}
+.nav button:hover,.nav button.active{color:var(--gold)}
+.container{max-width:1150px;margin:auto;padding:65px 25px}
+.section-title{text-align:center;margin-bottom:40px}
+.section-title small{color:var(--gold);letter-spacing:4px}
+.section-title h2{font-size:30px;font-weight:400;letter-spacing:5px}
+.section-title p{color:#9eafbd;font-size:13px}
+.intro{
+  text-align:center;line-height:2.2;color:#bdcbd7;
+  max-width:700px;margin:auto;
+}
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:20px;margin-top:45px;
+}
+.card{
+  background:#1a3046;border:1px solid #30475c;
+  padding:30px;text-align:center;
+}
+.card .symbol{font-size:35px;color:var(--gold)}
+.card h3{font-weight:400;letter-spacing:3px}
+.card p{font-size:13px;color:#aabac8;line-height:1.8}
+.btn{
+  background:var(--gold);color:#172a3c;
+  border:0;padding:11px 22px;margin:6px;
+}
+.btn.secondary{background:transparent;color:#e5edf4;border:1px solid #71869a}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+input,textarea{
+  width:100%;padding:13px;margin:8px 0;
+  color:white;background:#14283b;
+  border:1px solid #43596e;outline:none;
+}
+textarea{min-height:110px;resize:vertical}
+.upload-box{
+  border:1px dashed #647d91;padding:25px;
+  text-align:center;margin:20px 0;background:#172b40;
+}
+.gallery{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:15px;margin-top:25px;
+}
+.media-card{background:#1a3046;overflow:hidden}
+.media-card img,.media-card video{
+  width:100%;height:210px;object-fit:cover;display:block;
+  background:#0b1724;
+}
+.media-card p{padding:10px;color:#c4d1dc;font-size:13px}
+.message{
+  background:#1a3046;border-left:2px solid var(--gold);
+  padding:18px;margin:15px 0;
+}
+.message small{color:#9eafbd}
+.hidden{display:none!important}
+footer{
+  text-align:center;padding:45px 20px;
+  background:#0b1825;color:#8296a8;font-size:12px;
+  line-height:2.2;
+}
+#status{color:var(--gold);font-size:13px;min-height:22px}
+@media(max-width:600px){
+  .hero{min-height:420px}
+  .nav{gap:0}
+  .nav button{padding:9px;font-size:12px}
+  .container{padding:45px 17px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="hero">
+  <div class="top">
+    <div class="logo">OUR CLASS · MEMORY</div>
+    <div style="color:#d6b77a">FILM ARCHIVE</div>
+  </div>
+  <small>ONE CLASS · ONE STORY</small>
+  <h1>那些闪闪发光的日子</h1>
+  <p>
+    有些瞬间值得被记住。<br>
+    那些一起排练的日子、一起走过的舞台，<br>
+    都会成为青春里珍贵的收藏。
+  </p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showPage('home',this)">首页</button>
+  <button onclick="showPage('photos',this)">照片回忆</button>
+  <button onclick="showPage('videos',this)">视频回忆</button>
+  <button onclick="showPage('messages',this)">留言板</button>
+  <button onclick="showPage('member',this)">成员空间</button>
+</nav>
+
+<main>
+
+<!-- 首页 -->
+<section id="home" class="page">
+  <div class="container">
+    <div class="section-title">
+      <small>WELCOME TO OUR MEMORY</small>
+      <h2>班级排练纪念馆</h2>
+      <p>把共同经历的时光，珍藏在这里。</p>
+    </div>
+
+    <p class="intro">
+      从第一次排练到最后一次谢幕，<br>
+      从陌生到熟悉，从紧张到默契。<br>
+      我们曾经一起为同一个目标努力，<br>
+      这里收藏着属于我们的故事。
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="symbol">▧</div>
+        <h3>照片回忆</h3>
+        <p>收藏每一张照片，留住每一个值得纪念的瞬间。</p>
+        <button class="btn" onclick="showPage('photos')">进入照片墙</button>
+      </div>
+      <div class="card">
+        <div class="symbol">▶</div>
+        <h3>视频回忆</h3>
+        <p>记录排练花絮、舞台片段和那些有趣的日常。</p>
+        <button class="btn" onclick="showPage('videos')">进入视频馆</button>
+      </div>
+      <div class="card">
+        <div class="symbol">✉</div>
+        <h3>留下的话</h3>
+        <p>把想说的话留在这里，让回忆继续延伸。</p>
+        <button class="btn" onclick="showPage('messages')">前往留言板</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 照片墙 -->
+<section id="photos" class="page hidden">
+  <div class="container">
+    <div class="section-title">
+      <small>PHOTO COLLECTION</small>
+      <h2>照片回忆</h2>
+      <p>每一张照片，都是一段故事。</p>
+    </div>
+    <div class="upload-box">
+      <p>上传属于我们的照片</p>
+      <input id="photoFile" type="file" accept="image/*" multiple>
+      <button class="btn" onclick="uploadFiles('photoFile','image')">上传照片</button>
+      <p style="font-size:12px;color:#9eafbd">支持图片格式，单个文件最大50MB</p>
+    </div>
+    <div id="photoGallery" class="gallery"></div>
+  </div>
+</section>
+
+<!-- 视频馆 -->
+<section id="videos" class="page hidden">
+  <div class="container">
+    <div class="section-title">
+      <small>VIDEO COLLECTION</small>
+      <h2>视频回忆</h2>
+      <p>那些笑声、花絮和舞台瞬间。</p>
+    </div>
+    <div class="upload-box">
+      <p>上传排练视频与花絮</p>
+      <input id="videoFile" type="file" accept="video/*" multiple>
+      <button class="btn" onclick="uploadFiles('videoFile','video')">上传视频</button>
+      <p style="font-size:12px;color:#9eafbd">单个文件最大50MB</p>
+    </div>
+    <div id="videoGallery" class="gallery"></div>
+  </div>
+</section>
+
+<!-- 留言板 -->
+<section id="messages" class="page hidden">
+  <div class="container">
+    <div class="section-title">
+      <small>LETTERS TO US</small>
+      <h2>留下的话</h2>
+      <p>写给过去，也写给未来。</p>
+    </div>
+    <div style="max-width:650px;margin:auto">
+      <input id="messageName" placeholder="你的昵称">
+      <textarea id="messageText" placeholder="写下你想留下的话……"></textarea>
+      <button class="btn" onclick="sendMessage()">发布留言</button>
+      <div id="messageList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 成员空间 -->
+<section id="member" class="page hidden">
+  <div class="container">
+    <div class="section-title">
+      <small>MEMBER AREA</small>
+      <h2>成员空间</h2>
+      <p>欢迎回到我们的纪念馆。</p>
+    </div>
+    <div style="max-width:420px;margin:auto;text-align:center">
+      <div id="authPanel">
+        <input id="email" type="email" placeholder="邮箱地址">
+        <input id="password" type="password" placeholder="密码（至少6位）">
+        <button class="btn" onclick="signUp()">注册</button>
+        <button class="btn secondary" onclick="signIn()">登录</button>
+      </div>
+      <div id="userPanel" class="hidden">
+        <p>你已经登录成功。</p>
+        <p id="userEmail"></p>
+        <button class="btn secondary" onclick="signOut()">退出登录</button>
+      </div>
+      <p id="status"></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>OUR CLASS · OUR STORY</p>
+  <p>愿多年以后，我们仍然记得这段闪闪发光的日子。</p>
+  <p>CLASS REHEARSAL MEMORY © 2026</p>
+</footer>
+
+<script>
+// ① 在这里填写你的 Supabase 信息
+const SUPABASE_URL = "https://fkwgdknpzifzvsuvhlab.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Ak6LAl0UXlZLbesokcH_CA_fl9KXs3N";
+
+// ② 存储桶名称
+const BUCKET = "rehearsal-photos";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentUser = null;
+
+// 页面切换
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+
+  if(id==='photos') loadFiles('image');
+  if(id==='videos') loadFiles('video');
+  if(id==='messages') loadMessages();
+}
+
+// 状态提示
+function setStatus(msg){
+  document.getElementById('status').textContent=msg;
+}
+
+// 登录状态
+async function refreshUser(){
+  const {data}=await db.auth.getSession();
+  currentUser=data.session?.user||null;
+
+  document.getElementById('authPanel').classList.toggle('hidden',!!currentUser);
+  document.getElementById('userPanel').classList.toggle('hidden',!currentUser);
+
+  if(currentUser){
+    document.getElementById('userEmail').textContent=currentUser.email;
+  }
+}
+
+async function signUp(){
+  const email=document.getElementById('email').value.trim();
+  const password=document.getElementById('password').value;
+  if(!email||password.length<6)return setStatus('请填写有效邮箱和至少6位密码');
+
+  const {error}=await db.auth.signUp({email,password});
+  setStatus(error?error.message:'注册请求已提交，请检查邮箱确认邮件（如果启用了邮箱验证）。');
+}
+
+async function signIn(){
+  const email=document.getElementById('email').value.trim();
+  const password=document.getElementById('password').value;
+
+  const {error}=await db.auth.signInWithPassword({email,password});
+  if(error)return setStatus(error.message);
+
+  await refreshUser();
+  setStatus('登录成功！');
+}
+
+async function signOut(){
+  const {error}=await db.auth.signOut();
+  if(error)return setStatus(error.message);
+  await refreshUser();
+  setStatus('已退出登录');
+}
+
+db.auth.onAuthStateChange(()=>{
+  refreshUser();
+});
+
+// 上传照片或视频
+async function uploadFiles(inputId,type){
+  if(!currentUser){
+    alert('请先登录成员账号，再上传文件。');
+    showPage('member');
+    return;
+  }
+
+  const input=document.getElementById(inputId);
+  const files=Array.from(input.files||[]);
+  if(!files.length)return alert('请先选择文件');
+
+  const folder=type==='image'?'photos':'videos';
+
+  for(const file of files){
+    if(file.size>50*1024*1024){
+      alert(file.name+' 超过50MB，无法上传');
+      continue;
+    }
+
+    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const path=folder+'/'+Date.now()+'_'+crypto.randomUUID()+'_'+safeName;
+
+    const {error}=await db.storage.from(BUCKET).upload(path,file,{
+      upsert:false,
+      contentType:file.type
+    });
+
+    if(error){
+      alert(file.name+' 上传失败：'+error.message);
+    }
+  }
+
+  input.value='';
+  alert('上传操作完成，请查看是否有失败提示。');
+  loadFiles(type);
+}
+
+// 读取照片和视频
+async function loadFiles(type){
+  const folder=type==='image'?'photos':'videos';
+  const gallery=document.getElementById(type==='image'?'photoGallery':'videoGallery');
+
+  gallery.innerHTML='<p>正在加载回忆……</p>';
+
+  const {data,error}=await db.storage.from(BUCKET).list(folder,{
+    limit:100,
+    sortBy:{column:'created_at',order:'desc'}
+  });
+
+  if(error){
+    gallery.innerHTML='<p>加载失败：'+error.message+'</p>';
+    return;
+  }
+
+  const files=(data||[]).filter(f=>f.name&&!f.name.startsWith('.'));
+
+  if(!files.length){
+    gallery.innerHTML='<p>这里还没有回忆，等待第一份收藏。</p>';
+    return;
+  }
+
+  gallery.innerHTML='';
+
+  for(const file of files){
+    const path=folder+'/'+file.name;
+    const {data:urlData,error:urlError}=await db.storage.from(BUCKET).createSignedUrl(path,3600);
+
+    if(urlError||!urlData)continue;
+
+    const card=document.createElement('div');
+    card.className='media-card';
+
+    if(type==='image'){
+      const img=document.createElement('img');
+      img.src=urlData.signedUrl;
+      img.alt='班级回忆照片';
+      img.loading='lazy';
+      card.appendChild(img);
+    }else{
+      const video=document.createElement('video');
+      video.src=urlData.signedUrl;
+      video.controls=true;
+      video.preload='metadata';
+      card.appendChild(video);
+    }
+
+    const caption=document.createElement('p');
+    caption.textContent=file.name;
+    card.appendChild(caption);
+    gallery.appendChild(card);
+  }
+}
+
+// 发布留言
+async function sendMessage(){
+  const name=document.getElementById('messageName').value.trim();
+  const content=document.getElementById('messageText').value.trim();
+
+  if(!name||!content)return alert('请填写昵称和留言内容');
+
+  if(!currentUser){
+    alert('请先登录成员账号');
+    showPage('member');
+    return;
+  }
+
+  const {error}=await db.from('memory_messages').insert({
+    user_id:currentUser.id,
+    nickname:name,
+    content:content
+  });
+
+  if(error)return alert('发布失败：'+error.message);
+
+  document.getElementById('messageText').value='';
+  alert('留言成功！');
+  loadMessages();
+}
+
+// 读取留言
+async function loadMessages(){
+  const list=document.getElementById('messageList');
+  list.innerHTML='<p>正在加载留言……</p>';
+
+  const {data,error}=await db.from('memory_messages')
+    .select('*')
+    .order('created_at',{ascending:false})
+    .limit(100);
+
+  if(error){
+    list.textContent='留言加载失败：'+error.message;
+    return;
+  }
+
+  list.innerHTML='';
+
+  if(!data.length){
+    list.textContent='还没有留言，来写下第一句话吧。';
+    return;
+  }
+
+  data.forEach(item=>{
+    const box=document.createElement('div');
+    box.className='message';
+
+    const name=document.createElement('strong');
+    name.textContent=item.nickname;
+
+    const content=document.createElement('p');
+    content.textContent=item.content;
+
+    const date=document.createElement('small');
+    date.textContent=new Date(item.created_at).toLocaleString('zh-CN');
+
+    box.append(name,content,date);
+    list.appendChild(box);
+  });
+}
+
+refreshUser();
+</script>
+</body>
+</html>
