@@ -808,15 +808,23 @@ async function uploadFiles(inputId,type){
     :['video/mp4','video/webm','video/quicktime'];
 
   let completed=0;
+  let errorDetails=[];
   let failed=0;
 
   for(let i=0;i<files.length;i++){
     const file=files[i];
 
-    if(!allowed.includes(file.type)||file.size>50*1024*1024){
-      failed++;
-      continue;
-    }
+    if(!allowed.includes(file.type)){
+  failed++;
+  errorDetails.push(file.name+'：不支持的格式（'+(file.type||'格式未识别')+'）');
+  continue;
+}
+
+if(file.size>50*1024*1024){
+  failed++;
+  errorDetails.push(file.name+'：超过50MB');
+  continue;
+}
 
     status.textContent='正在上传 '+(i+1)+' / '+files.length+'：'+file.name;
 
@@ -829,9 +837,10 @@ async function uploadFiles(inputId,type){
     });
 
     if(error){
-      failed++;
-      console.error(error);
-    }else{
+  failed++;
+  errorDetails.push(file.name+'：'+error.message);
+  console.error(error);
+}else{
       completed++;
     }
 
@@ -839,7 +848,8 @@ async function uploadFiles(inputId,type){
   }
 
   input.value='';
-  status.textContent='上传完成：成功 '+completed+' 个，失败 '+failed+' 个。';
+  status.textContent='上传完成：成功 '+completed+' 个，失败 '+failed+' 个。'+
+  (errorDetails.length?' 原因：'+errorDetails.join('；'):'');
 
   toast('上传完成！');
   await loadFiles(type);
