@@ -3,265 +3,514 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>班级排练纪念馆</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101c2b">
+<title>计科2606 · 青春纪念馆</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --blue:#244e70;
-  --deep:#142d46;
-  --light:#e8f0f6;
-  --gold:#d6b77a;
-  --white:#f8fafc;
+:root{
+  --bg:#101c2b;
+  --panel:#192a3d;
+  --panel2:#20364c;
+  --gold:#d8bc88;
+  --cream:#eee9df;
+  --muted:#a4b1bd;
+  --line:rgba(216,188,136,.22);
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
 body{
-  margin:0;
-  background:#101e2c;
-  color:var(--white);
-  font-family:"Microsoft YaHei",sans-serif;
+  margin:0;background:var(--bg);color:var(--cream);
+  font-family:"Microsoft YaHei",Arial,sans-serif;
+  overflow-x:hidden;
 }
 button,input,textarea{font:inherit}
 button{cursor:pointer}
-.hero{
-  min-height:490px;
-  padding:30px 8%;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
+a{color:inherit;text-decoration:none}
+::selection{background:var(--gold);color:var(--bg)}
+
+.noise{
+  pointer-events:none;position:fixed;inset:0;z-index:20;
+  opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+header{
+  min-height:660px;position:relative;overflow:hidden;
+  display:flex;align-items:center;padding:100px 9%;
   background:
-  linear-gradient(90deg,rgba(9,25,43,.94),rgba(20,45,70,.55)),
-  url("https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1600")
+  linear-gradient(90deg,rgba(8,19,31,.94),rgba(11,26,42,.72),rgba(11,26,42,.28)),
+  linear-gradient(0deg,var(--bg),transparent 40%),
+  url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=2000")
   center/cover;
 }
-.top{
-  position:absolute;top:25px;left:8%;right:8%;
-  display:flex;justify-content:space-between;align-items:center;
+header:after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 45%,rgba(216,188,136,.08));
+  pointer-events:none;
 }
-.logo{letter-spacing:4px;color:#d6b77a;font-size:14px}
-.hero h1{
-  font-family:Georgia,serif;
-  font-size:clamp(38px,7vw,76px);
-  letter-spacing:5px;
-  margin:60px 0 15px;
+.header-content{position:relative;z-index:1;max-width:850px}
+.school{
+  font-size:12px;letter-spacing:5px;color:var(--gold);
+  text-transform:uppercase;margin-bottom:30px;
 }
-.hero p{color:#d4dce5;line-height:2;max-width:500px}
-.hero small{color:var(--gold);letter-spacing:5px}
-.nav{
-  position:sticky;top:0;z-index:10;
-  display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
-  padding:15px;background:rgba(15,32,49,.96);
-  border-bottom:1px solid #30475c;
+.header-content h1{
+  font-family:Georgia,"Songti SC",serif;
+  font-weight:400;font-size:clamp(45px,8vw,94px);
+  line-height:1.16;letter-spacing:5px;margin:0;
 }
-.nav button{
-  color:#d8e2eb;background:none;border:0;
-  padding:10px 17px;letter-spacing:2px;
+.header-content h1 span{color:var(--gold)}
+.subtitle{
+  color:#c2ccd4;line-height:2.2;font-size:14px;
+  letter-spacing:2px;margin-top:25px;
 }
-.nav button:hover,.nav button.active{color:var(--gold)}
-.container{max-width:1150px;margin:auto;padding:65px 25px}
-.section-title{text-align:center;margin-bottom:40px}
-.section-title small{color:var(--gold);letter-spacing:4px}
-.section-title h2{font-size:30px;font-weight:400;letter-spacing:5px}
-.section-title p{color:#9eafbd;font-size:13px}
+.hero-line{width:75px;height:1px;background:var(--gold);margin:30px 0}
+.hero-note{font-size:11px;letter-spacing:4px;color:#aeb9c4}
+.scroll-tip{
+  position:absolute;bottom:35px;left:9%;z-index:1;
+  color:#c2ccd4;font-size:10px;letter-spacing:4px;
+}
+.scroll-tip:after{
+  content:"";display:inline-block;width:55px;height:1px;
+  background:var(--gold);vertical-align:middle;margin-left:15px;
+}
+nav{
+  position:sticky;top:0;z-index:15;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 7%;min-height:68px;
+  background:rgba(13,27,42,.94);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line);
+}
+.nav-brand{font-family:Georgia,serif;color:var(--gold);letter-spacing:2px;font-size:17px}
+.nav-links{display:flex;gap:26px;align-items:center}
+.nav-links button{
+  border:0;background:none;color:#c0cbd5;
+  font-size:12px;letter-spacing:2px;padding:24px 0;
+  transition:.25s;
+}
+.nav-links button:hover,.nav-links button.active{color:var(--gold)}
+.menu-btn{display:none;background:none;border:0;color:var(--cream);font-size:24px}
+
+.page{display:none;animation:pageIn .65s ease both}
+  .hidden{display:none!important}
+.page.active{display:block}
+@keyframes pageIn{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.container{width:min(1120px,88%);margin:auto;padding:90px 0}
+.section-head{text-align:center;margin-bottom:55px}
+.eyebrow{font-size:10px;letter-spacing:5px;color:var(--gold)}
+.section-head h2{
+  font-family:Georgia,"Songti SC",serif;font-weight:400;
+  font-size:clamp(30px,5vw,48px);letter-spacing:5px;margin:18px 0;
+}
+.section-head p{font-size:13px;color:var(--muted);letter-spacing:2px}
 .intro{
-  text-align:center;line-height:2.2;color:#bdcbd7;
-  max-width:700px;margin:auto;
+  max-width:700px;margin:0 auto;text-align:center;
+  line-height:2.6;color:#bdc8d1;font-size:14px;
 }
-.cards{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-  gap:20px;margin-top:45px;
+.gold{color:var(--gold)}
+.home-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:18px;margin-top:70px;
 }
-.card{
-  background:#1a3046;border:1px solid #30475c;
-  padding:30px;text-align:center;
+.feature{
+  position:relative;overflow:hidden;min-height:205px;
+  padding:30px;background:linear-gradient(145deg,#20364b,#172739);
+  border:1px solid var(--line);transition:.4s;
 }
-.card .symbol{font-size:35px;color:var(--gold)}
-.card h3{font-weight:400;letter-spacing:3px}
-.card p{font-size:13px;color:#aabac8;line-height:1.8}
-.btn{
-  background:var(--gold);color:#172a3c;
-  border:0;padding:11px 22px;margin:6px;
+.feature:hover{transform:translateY(-7px);border-color:var(--gold)}
+.feature .num{font-family:Georgia,serif;color:var(--gold);font-size:35px}
+.feature h3{font-weight:400;letter-spacing:3px;margin:20px 0 10px}
+.feature p{color:var(--muted);font-size:12px;line-height:1.9}
+.text-btn{
+  border:0;background:none;color:var(--gold);
+  padding:0;margin-top:15px;letter-spacing:2px;font-size:12px;
 }
-.btn.secondary{background:transparent;color:#e5edf4;border:1px solid #71869a}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-input,textarea{
-  width:100%;padding:13px;margin:8px 0;
-  color:white;background:#14283b;
-  border:1px solid #43596e;outline:none;
+.stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:15px;margin:65px 0 10px;text-align:center;
 }
-textarea{min-height:110px;resize:vertical}
+.stat{padding:25px;border-top:1px solid var(--line)}
+.stat strong{display:block;font-family:Georgia,serif;font-size:34px;color:var(--gold);font-weight:400}
+.stat span{font-size:11px;color:var(--muted);letter-spacing:3px}
+
+.featured-wrap{margin-top:80px}
+.featured-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.featured-title h3{font-weight:400;letter-spacing:3px}
+.featured-title span{font-size:10px;color:var(--gold);letter-spacing:3px}
+.featured{
+  height:360px;position:relative;overflow:hidden;
+  background:#1a2b3d;border:1px solid var(--line);
+}
+.featured img{
+  width:100%;height:100%;object-fit:cover;
+  opacity:.8;transition:opacity .5s,transform 1.1s;
+}
+.featured:hover img{transform:scale(1.035)}
+.featured-caption{
+  position:absolute;bottom:0;left:0;right:0;padding:35px;
+  background:linear-gradient(transparent,rgba(5,15,25,.9));
+  letter-spacing:3px;
+}
+.featured-caption span{font-size:11px;color:var(--gold)}
+.featured-caption h3{font-family:Georgia,serif;font-weight:400;font-size:25px;margin:10px 0 0}
+
+.film-strip{
+  overflow:hidden;background:#0a1420;padding:17px 0;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+.film-track{
+  display:inline-flex;gap:45px;align-items:center;
+  animation:marquee 28s linear infinite;
+}
+.film-track span{font-size:11px;letter-spacing:5px;color:#b9a47e}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+.toolbar{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:15px;flex-wrap:wrap;margin:25px 0;
+}
 .upload-box{
-  border:1px dashed #647d91;padding:25px;
-  text-align:center;margin:20px 0;background:#172b40;
+  padding:25px;border:1px dashed #63788b;
+  background:#192a3d;text-align:center;
 }
+.upload-box p{font-size:13px;color:var(--muted);line-height:1.8}
+input,textarea{
+  width:100%;padding:13px 15px;margin:8px 0;
+  color:var(--cream);background:#142438;
+  border:1px solid #40566b;outline:none;
+  border-radius:2px;
+}
+input:focus,textarea:focus{border-color:var(--gold)}
+input[type=file]{max-width:100%}
+textarea{min-height:120px;resize:vertical}
+.btn{
+  border:1px solid var(--gold);background:var(--gold);
+  color:#17283a;padding:12px 24px;letter-spacing:2px;
+  font-size:12px;transition:.25s;
+}
+.btn:hover{background:transparent;color:var(--gold)}
+.btn.outline{background:transparent;color:var(--gold)}
+.btn.outline:hover{background:var(--gold);color:#17283a}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
 .gallery{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:15px;margin-top:25px;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:20px;margin-top:30px;
 }
-.media-card{background:#1a3046;overflow:hidden}
-.media-card img,.media-card video{
-  width:100%;height:210px;object-fit:cover;display:block;
-  background:#0b1724;
+.media-card{
+  min-width:0;position:relative;background:#192a3d;
+  border:1px solid rgba(255,255,255,.07);
+  overflow:hidden;opacity:0;transform:translateY(25px);
+  transition:opacity .65s,transform .65s,border-color .35s;
 }
-.media-card p{padding:10px;color:#c4d1dc;font-size:13px}
+.media-card.visible{opacity:1;transform:translateY(0)}
+.media-card:hover{border-color:var(--gold);transform:translateY(-5px)}
+.media-frame{height:245px;overflow:hidden;background:#0b1724;cursor:pointer}
+.media-frame img,.media-frame video{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform .7s;
+}
+.media-card:hover .media-frame img{transform:scale(1.07)}
+.media-caption{
+  padding:15px;display:flex;justify-content:space-between;gap:10px;
+  color:#d9dfe5;font-size:12px;
+}
+.media-caption small{color:#8fa0ae}
+.empty{
+  grid-column:1/-1;text-align:center;padding:55px 10px;
+  color:var(--muted);border:1px dashed #40566b;
+  font-size:13px;line-height:2;
+}
+.progress{height:3px;background:#304255;margin-top:12px;overflow:hidden}
+.progress span{display:block;height:100%;width:0;background:var(--gold);transition:width .2s}
+
+.message-form{max-width:650px;margin:0 auto 45px}
 .message{
-  background:#1a3046;border-left:2px solid var(--gold);
-  padding:18px;margin:15px 0;
+  padding:23px;margin:15px 0;background:#1b2d41;
+  border-left:2px solid var(--gold);
+  animation:pageIn .5s ease both;
 }
-.message small{color:#9eafbd}
-.hidden{display:none!important}
-footer{
-  text-align:center;padding:45px 20px;
-  background:#0b1825;color:#8296a8;font-size:12px;
-  line-height:2.2;
+.message-top{display:flex;justify-content:space-between;gap:15px}
+.message strong{font-weight:400;color:var(--gold);letter-spacing:2px}
+.message small{color:#8fa0ae;font-size:10px}
+.message p{line-height:2;color:#d0d9e1;font-size:13px;white-space:pre-wrap}
+
+.member-card{
+  max-width:480px;margin:auto;padding:35px;
+  background:#1a2c40;border:1px solid var(--line);
+  text-align:center;
 }
-#status{color:var(--gold);font-size:13px;min-height:22px}
-@media(max-width:600px){
-  .hero{min-height:420px}
-  .nav{gap:0}
-  .nav button{padding:9px;font-size:12px}
-  .container{padding:45px 17px}
+.member-card h3{font-weight:400;letter-spacing:3px}
+.member-card p{font-size:12px;color:var(--muted);line-height:2}
+#status{font-size:12px;color:var(--gold);min-height:25px;margin-top:15px}
+
+.credits{
+  padding:100px 20px;text-align:center;
+  background:linear-gradient(180deg,#142337,#09131e);
+  border-top:1px solid var(--line);
+}
+.credits .big{
+  font-family:Georgia,serif;font-size:clamp(30px,6vw,62px);
+  font-weight:400;letter-spacing:5px;color:var(--gold);
+}
+.credits p{font-size:12px;color:var(--muted);letter-spacing:3px;line-height:2.5}
+.credits .rule{width:50px;height:1px;background:var(--gold);margin:30px auto}
+footer{text-align:center;padding:25px;color:#718395;font-size:10px;letter-spacing:2px}
+
+.modal{
+  position:fixed;inset:0;z-index:30;
+  background:rgba(3,9,16,.94);display:none;
+  align-items:center;justify-content:center;padding:25px;
+}
+.modal.open{display:flex;animation:pageIn .25s}
+.modal img,.modal video{max-width:95%;max-height:85vh;object-fit:contain}
+.modal-close{
+  position:absolute;right:30px;top:25px;
+  border:0;background:none;color:white;font-size:35px;
+}
+.toast{
+  position:fixed;bottom:25px;left:50%;transform:translateX(-50%);
+  z-index:40;background:#d8bc88;color:#142438;
+  padding:13px 22px;font-size:12px;display:none;
+}
+.toast.show{display:block;animation:pageIn .25s}
+
+@media(max-width:760px){
+  header{min-height:570px;padding:80px 7%}
+  nav{padding:0 6%}
+  .menu-btn{display:block}
+  .nav-links{
+    display:none;position:absolute;top:68px;left:0;right:0;
+    padding:12px 7% 20px;background:#101c2b;
+    flex-direction:column;align-items:stretch;gap:0;
+    border-bottom:1px solid var(--line);
+  }
+  .nav-links.open{display:flex}
+  .nav-links button{text-align:left;padding:14px 0}
+  .container{padding:65px 0;width:88%}
+  .home-cards{grid-template-columns:1fr}
+  .gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .media-frame{height:180px}
+  .featured{height:260px}
+  .stats{gap:5px}
+  .stat strong{font-size:27px}
+}
+@media(max-width:420px){
+  .gallery{grid-template-columns:1fr}
+  .media-frame{height:230px}
+  .header-content h1{letter-spacing:2px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}
 }
 </style>
 </head>
 
 <body>
+<div class="noise"></div>
 
-<header class="hero">
-  <div class="top">
-    <div class="logo">OUR CLASS · MEMORY</div>
-    <div style="color:#d6b77a">FILM ARCHIVE</div>
+<header>
+  <div class="header-content">
+    <div class="school">SHANDONG UNIVERSITY OF TECHNOLOGY</div>
+    <h1>我们的故事<br><span>不止于此。</span></h1>
+    <div class="hero-line"></div>
+    <div class="subtitle">
+      山东理工大学 · 计算机科学与技术<br>
+      计科2606 · 班级数字纪念馆
+    </div>
+    <p class="hero-note">2026 — TO BE CONTINUED</p>
   </div>
-  <small>ONE CLASS · ONE STORY</small>
-  <h1>那些闪闪发光的日子</h1>
-  <p>
-    有些瞬间值得被记住。<br>
-    那些一起排练的日子、一起走过的舞台，<br>
-    都会成为青春里珍贵的收藏。
-  </p>
+  <div class="scroll-tip">SCROLL TO EXPLORE</div>
 </header>
 
-<nav class="nav">
-  <button class="active" onclick="showPage('home',this)">首页</button>
-  <button onclick="showPage('photos',this)">照片回忆</button>
-  <button onclick="showPage('videos',this)">视频回忆</button>
-  <button onclick="showPage('messages',this)">留言板</button>
-  <button onclick="showPage('member',this)">成员空间</button>
+<nav>
+  <div class="nav-brand">CS · 2606</div>
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <div class="nav-links" id="navLinks">
+    <button class="active" onclick="showPage('home',this)">首页</button>
+    <button onclick="showPage('photos',this)">照片回忆</button>
+    <button onclick="showPage('videos',this)">视频馆</button>
+    <button onclick="showPage('messages',this)">留言板</button>
+    <button onclick="showPage('member',this)">成员空间</button>
+  </div>
 </nav>
 
 <main>
 
 <!-- 首页 -->
-<section id="home" class="page">
+<section id="home" class="page active">
   <div class="container">
-    <div class="section-title">
-      <small>WELCOME TO OUR MEMORY</small>
-      <h2>班级排练纪念馆</h2>
-      <p>把共同经历的时光，珍藏在这里。</p>
+    <div class="section-head">
+      <div class="eyebrow">A STORY ABOUT US</div>
+      <h2>写给计科2606</h2>
+      <p>相遇于山理工，珍藏于时光里。</p>
     </div>
 
-    <p class="intro">
-      从第一次排练到最后一次谢幕，<br>
-      从陌生到熟悉，从紧张到默契。<br>
-      我们曾经一起为同一个目标努力，<br>
-      这里收藏着属于我们的故事。
-    </p>
+    <div class="intro">
+      也许很多年以后，我们会忘记某一次排练的细节，<br>
+      忘记某个普通的傍晚，忘记当时说过的某句话。<br>
+      但希望这里能替我们记住——<br>
+      <span class="gold">我们曾经一起认真地度过这段青春。</span>
+    </div>
 
-    <div class="cards">
-      <div class="card">
-        <div class="symbol">▧</div>
-        <h3>照片回忆</h3>
-        <p>收藏每一张照片，留住每一个值得纪念的瞬间。</p>
-        <button class="btn" onclick="showPage('photos')">进入照片墙</button>
+    <div class="stats">
+      <div class="stat"><strong>2606</strong><span>OUR CLASS</span></div>
+      <div class="stat"><strong>2026</strong><span>OUR BEGINNING</span></div>
+      <div class="stat"><strong>∞</strong><span>OUR MEMORIES</span></div>
+    </div>
+
+    <div class="home-cards">
+      <article class="feature">
+        <div class="num">01</div><h3>照片回忆</h3>
+        <p>那些没有被时间带走的瞬间，都在这里。</p>
+        <button class="text-btn" onclick="showPage('photos')">EXPLORE →</button>
+      </article>
+      <article class="feature">
+        <div class="num">02</div><h3>视频馆</h3>
+        <p>把笑声、花絮和舞台留在时间里。</p>
+        <button class="text-btn" onclick="showPage('videos')">EXPLORE →</button>
+      </article>
+      <article class="feature">
+        <div class="num">03</div><h3>留下的话</h3>
+        <p>写给现在，也写给多年以后的我们。</p>
+        <button class="text-btn" onclick="showPage('messages')">EXPLORE →</button>
+      </article>
+    </div>
+
+    <div class="featured-wrap">
+      <div class="featured-title">
+        <h3>最近收藏的瞬间</h3><span>MEMORY SPOTLIGHT</span>
       </div>
-      <div class="card">
-        <div class="symbol">▶</div>
-        <h3>视频回忆</h3>
-        <p>记录排练花絮、舞台片段和那些有趣的日常。</p>
-        <button class="btn" onclick="showPage('videos')">进入视频馆</button>
+      <div class="featured" id="featured">
+        <img id="featuredImage"
+          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200"
+          alt="校园记忆">
+        <div class="featured-caption">
+          <span>OUR CLASS · OUR TIME</span>
+          <h3 id="featuredCaption">每一段相遇，都值得珍藏。</h3>
+        </div>
       </div>
-      <div class="card">
-        <div class="symbol">✉</div>
-        <h3>留下的话</h3>
-        <p>把想说的话留在这里，让回忆继续延伸。</p>
-        <button class="btn" onclick="showPage('messages')">前往留言板</button>
-      </div>
+    </div>
+  </div>
+
+  <div class="film-strip">
+    <div class="film-track">
+      <span>SHANDONG UNIVERSITY OF TECHNOLOGY</span><span>✦</span>
+      <span>COMPUTER SCIENCE 2606</span><span>✦</span>
+      <span>OUR YOUTH · OUR STORY</span><span>✦</span>
+      <span>SHANDONG UNIVERSITY OF TECHNOLOGY</span><span>✦</span>
+      <span>COMPUTER SCIENCE 2606</span><span>✦</span>
+      <span>OUR YOUTH · OUR STORY</span><span>✦</span>
     </div>
   </div>
 </section>
 
 <!-- 照片墙 -->
-<section id="photos" class="page hidden">
+<section id="photos" class="page">
   <div class="container">
-    <div class="section-title">
-      <small>PHOTO COLLECTION</small>
+    <div class="section-head">
+      <div class="eyebrow">FRAME BY FRAME</div>
       <h2>照片回忆</h2>
-      <p>每一张照片，都是一段故事。</p>
+      <p>把普通的日子，收藏成闪光的瞬间。</p>
     </div>
+
     <div class="upload-box">
-      <p>上传属于我们的照片</p>
-      <input id="photoFile" type="file" accept="image/*" multiple>
+      <div class="gold" style="font-size:28px">＋</div>
+      <h3 style="font-weight:400;letter-spacing:3px">收藏新的瞬间</h3>
+      <p>登录成员账号后即可上传照片。支持 JPG、PNG、WEBP、GIF。</p>
+      <input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
       <button class="btn" onclick="uploadFiles('photoFile','image')">上传照片</button>
-      <p style="font-size:12px;color:#9eafbd">支持图片格式，单个文件最大50MB</p>
+      <div class="progress"><span id="photoProgress"></span></div>
+      <p id="photoStatus">单张照片最大50MB</p>
     </div>
-    <div id="photoGallery" class="gallery"></div>
+
+    <div class="toolbar">
+      <span class="gold" style="letter-spacing:3px;font-size:11px">PHOTO COLLECTION</span>
+      <button class="btn outline" onclick="loadFiles('image')">刷新照片</button>
+    </div>
+    <div id="photoGallery" class="gallery">
+      <div class="empty">登录成员账号后，即可浏览照片收藏。</div>
+    </div>
   </div>
 </section>
 
 <!-- 视频馆 -->
-<section id="videos" class="page hidden">
+<section id="videos" class="page">
   <div class="container">
-    <div class="section-title">
-      <small>VIDEO COLLECTION</small>
-      <h2>视频回忆</h2>
-      <p>那些笑声、花絮和舞台瞬间。</p>
+    <div class="section-head">
+      <div class="eyebrow">MOVING MEMORIES</div>
+      <h2>视频回忆馆</h2>
+      <p>那些会动的回忆，比文字更鲜活。</p>
     </div>
+
     <div class="upload-box">
-      <p>上传排练视频与花絮</p>
-      <input id="videoFile" type="file" accept="video/*" multiple>
+      <div class="gold" style="font-size:28px">▶</div>
+      <h3 style="font-weight:400;letter-spacing:3px">收藏一段影像</h3>
+      <p>登录成员账号后上传排练花絮、舞台记录和班级视频。</p>
+      <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime" multiple>
       <button class="btn" onclick="uploadFiles('videoFile','video')">上传视频</button>
-      <p style="font-size:12px;color:#9eafbd">单个文件最大50MB</p>
+      <div class="progress"><span id="videoProgress"></span></div>
+      <p id="videoStatus">单个视频最大50MB</p>
     </div>
-    <div id="videoGallery" class="gallery"></div>
+
+    <div class="toolbar">
+      <span class="gold" style="letter-spacing:3px;font-size:11px">VIDEO COLLECTION</span>
+      <button class="btn outline" onclick="loadFiles('video')">刷新视频</button>
+    </div>
+    <div id="videoGallery" class="gallery">
+      <div class="empty">登录成员账号后，即可浏览视频收藏。</div>
+    </div>
   </div>
 </section>
 
 <!-- 留言板 -->
-<section id="messages" class="page hidden">
+<section id="messages" class="page">
   <div class="container">
-    <div class="section-title">
-      <small>LETTERS TO US</small>
+    <div class="section-head">
+      <div class="eyebrow">LETTERS TO THE FUTURE</div>
       <h2>留下的话</h2>
-      <p>写给过去，也写给未来。</p>
+      <p>有些话，现在说给彼此听。</p>
     </div>
-    <div style="max-width:650px;margin:auto">
-      <input id="messageName" placeholder="你的昵称">
-      <textarea id="messageText" placeholder="写下你想留下的话……"></textarea>
+    <div class="message-form">
+      <input id="messageName" maxlength="30" placeholder="留下你的昵称">
+      <textarea id="messageText" maxlength="1000" placeholder="写下你想对计科2606说的话……"></textarea>
       <button class="btn" onclick="sendMessage()">发布留言</button>
-      <div id="messageList"></div>
+      <p id="messageStatus" style="color:var(--gold);font-size:12px"></p>
+    </div>
+    <div id="messageList">
+      <div class="empty">正在等待我们的第一封信。</div>
     </div>
   </div>
 </section>
 
 <!-- 成员空间 -->
-<section id="member" class="page hidden">
+<section id="member" class="page">
   <div class="container">
-    <div class="section-title">
-      <small>MEMBER AREA</small>
+    <div class="section-head">
+      <div class="eyebrow">MEMBERS ONLY</div>
       <h2>成员空间</h2>
-      <p>欢迎回到我们的纪念馆。</p>
+      <p>只有一起经历过的人，才懂这些回忆。</p>
     </div>
-    <div style="max-width:420px;margin:auto;text-align:center">
+    <div class="member-card">
+      <div class="gold" style="font-family:Georgia,serif;font-size:36px">2606</div>
+      <h3>欢迎回到我们的纪念馆</h3>
+      <p>登录后可以上传照片、视频，并留下专属留言。</p>
+
       <div id="authPanel">
         <input id="email" type="email" placeholder="邮箱地址">
         <input id="password" type="password" placeholder="密码（至少6位）">
-        <button class="btn" onclick="signUp()">注册</button>
-        <button class="btn secondary" onclick="signIn()">登录</button>
+        <button class="btn" onclick="signIn()">登录</button>
+        <button class="btn outline" onclick="signUp()">注册账号</button>
       </div>
+
       <div id="userPanel" class="hidden">
-        <p>你已经登录成功。</p>
-        <p id="userEmail"></p>
-        <button class="btn secondary" onclick="signOut()">退出登录</button>
+        <p>登录成功，欢迎回来。</p>
+        <p id="userEmail" class="gold"></p>
+        <button class="btn outline" onclick="signOut()">退出登录</button>
       </div>
       <p id="status"></p>
     </div>
@@ -270,107 +519,185 @@ footer{
 
 </main>
 
-<footer>
-  <p>OUR CLASS · OUR STORY</p>
-  <p>愿多年以后，我们仍然记得这段闪闪发光的日子。</p>
-  <p>CLASS REHEARSAL MEMORY © 2026</p>
-</footer>
+<!-- 片尾 -->
+<section class="credits">
+  <div class="eyebrow">THE END IS A NEW BEGINNING</div>
+  <div class="rule"></div>
+  <div class="big">计科2606</div>
+  <p>山东理工大学 · 计算机科学与技术</p>
+  <p>感谢每一个参与这段故事的你。</p>
+  <div class="rule"></div>
+  <p>OUR YOUTH IS STILL IN PROGRESS.</p>
+  <p>2026 — FOREVER IN MEMORY</p>
+</section>
+
+<footer>SHANDONG UNIVERSITY OF TECHNOLOGY · COMPUTER SCIENCE 2606</footer>
+
+<div class="modal" id="mediaModal" onclick="closeModal(event)">
+  <button class="modal-close" onclick="closeModal()">×</button>
+  <div id="modalContent"></div>
+</div>
+<div class="toast" id="toast"></div>
 
 <script>
-// ① 在这里填写你的 Supabase 信息
+// ====================================
+// ① Supabase 配置：保留你自己的原值！
+// ====================================
 const SUPABASE_URL = "https://fkwgdknpzifzvsuvhlab.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Ak6LAl0UXlZLbesokcH_CA_fl9KXs3N";
-
-// ② 存储桶名称
 const BUCKET = "rehearsal-photos";
 
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
+// ====================================
+// ② 初始化
+// ====================================
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let currentUser = null;
+let photoItems = [];
+let slideIndex = 0;
+let slideTimer = null;
 
-// 页面切换
+function toast(message){
+  const el=document.getElementById('toast');
+  el.textContent=message;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+
 function showPage(id,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 
-  if(id==='photos') loadFiles('image');
-  if(id==='videos') loadFiles('video');
-  if(id==='messages') loadMessages();
+  document.querySelectorAll('.nav-links button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+
+  document.getElementById('navLinks').classList.remove('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  if(id==='photos')loadFiles('image');
+  if(id==='videos')loadFiles('video');
+  if(id==='messages')loadMessages();
 }
 
-// 状态提示
-function setStatus(msg){
-  document.getElementById('status').textContent=msg;
+function toggleMenu(){
+  document.getElementById('navLinks').classList.toggle('open');
 }
 
-// 登录状态
+// ====================================
+// ③ 登录注册
+// ====================================
+function setStatus(message){
+  document.getElementById('status').textContent=message;
+}
+
 async function refreshUser(){
-  const {data}=await db.auth.getSession();
-  currentUser=data.session?.user||null;
+  const {data,error}=await db.auth.getSession();
+  if(error){setStatus(error.message);return;}
 
+  currentUser=data.session?.user||null;
   document.getElementById('authPanel').classList.toggle('hidden',!!currentUser);
   document.getElementById('userPanel').classList.toggle('hidden',!currentUser);
 
   if(currentUser){
     document.getElementById('userEmail').textContent=currentUser.email;
+    setStatus('已登录，欢迎回来。');
+  }else{
+    setStatus('请登录成员账号。');
   }
 }
 
 async function signUp(){
   const email=document.getElementById('email').value.trim();
   const password=document.getElementById('password').value;
-  if(!email||password.length<6)return setStatus('请填写有效邮箱和至少6位密码');
 
-  const {error}=await db.auth.signUp({email,password});
-  setStatus(error?error.message:'注册请求已提交，请检查邮箱确认邮件（如果启用了邮箱验证）。');
+  if(!email||password.length<6){
+    setStatus('请输入有效邮箱和至少6位密码。');return;
+  }
+
+  setStatus('正在提交注册……');
+  const {data,error}=await db.auth.signUp({email,password});
+
+  if(error){setStatus('注册失败：'+error.message);return;}
+
+  if(data.session){
+    await refreshUser();
+    toast('注册成功！');
+  }else{
+    setStatus('注册请求已提交，请检查邮箱并完成验证后登录。');
+  }
 }
 
 async function signIn(){
   const email=document.getElementById('email').value.trim();
   const password=document.getElementById('password').value;
 
+  if(!email||!password){setStatus('请填写邮箱和密码。');return;}
+
+  setStatus('正在登录……');
   const {error}=await db.auth.signInWithPassword({email,password});
-  if(error)return setStatus(error.message);
+
+  if(error){setStatus('登录失败：'+error.message);return;}
 
   await refreshUser();
-  setStatus('登录成功！');
+  toast('登录成功！');
+  loadFiles('image');
+  loadFiles('video');
+  loadMessages();
 }
 
 async function signOut(){
   const {error}=await db.auth.signOut();
-  if(error)return setStatus(error.message);
+  if(error){setStatus(error.message);return;}
+  currentUser=null;
   await refreshUser();
-  setStatus('已退出登录');
+  toast('已退出登录');
 }
 
-db.auth.onAuthStateChange(()=>{
-  refreshUser();
+db.auth.onAuthStateChange((_event,session)=>{
+  currentUser=session?.user||null;
+  document.getElementById('authPanel').classList.toggle('hidden',!!currentUser);
+  document.getElementById('userPanel').classList.toggle('hidden',!currentUser);
+  if(currentUser){
+    document.getElementById('userEmail').textContent=currentUser.email;
+    setStatus('已登录，欢迎回来。');
+  }else{
+    setStatus('请登录成员账号。');
+  }
 });
 
-// 上传照片或视频
+// ====================================
+// ④ 照片和视频上传
+// ====================================
 async function uploadFiles(inputId,type){
   if(!currentUser){
-    alert('请先登录成员账号，再上传文件。');
+    toast('请先登录成员账号');
     showPage('member');
     return;
   }
 
   const input=document.getElementById(inputId);
   const files=Array.from(input.files||[]);
-  if(!files.length)return alert('请先选择文件');
+  if(!files.length){toast('请先选择文件');return;}
 
   const folder=type==='image'?'photos':'videos';
+  const status=document.getElementById(type==='image'?'photoStatus':'videoStatus');
+  const progress=document.getElementById(type==='image'?'photoProgress':'videoProgress');
 
-  for(const file of files){
-    if(file.size>50*1024*1024){
-      alert(file.name+' 超过50MB，无法上传');
+  const allowed=type==='image'
+    ?['image/jpeg','image/png','image/webp','image/gif']
+    :['video/mp4','video/webm','video/quicktime'];
+
+  let completed=0;
+  let failed=0;
+
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+
+    if(!allowed.includes(file.type)||file.size>50*1024*1024){
+      failed++;
       continue;
     }
+
+    status.textContent='正在上传 '+(i+1)+' / '+files.length+'：'+file.name;
 
     const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
     const path=folder+'/'+Date.now()+'_'+crypto.randomUUID()+'_'+safeName;
@@ -381,36 +708,52 @@ async function uploadFiles(inputId,type){
     });
 
     if(error){
-      alert(file.name+' 上传失败：'+error.message);
+      failed++;
+      console.error(error);
+    }else{
+      completed++;
     }
+
+    progress.style.width=((i+1)/files.length*100)+'%';
   }
 
   input.value='';
-  alert('上传操作完成，请查看是否有失败提示。');
-  loadFiles(type);
+  status.textContent='上传完成：成功 '+completed+' 个，失败 '+failed+' 个。';
+
+  toast('上传完成！');
+  await loadFiles(type);
 }
 
-// 读取照片和视频
+// ====================================
+// ⑤ 读取照片与视频
+// ====================================
 async function loadFiles(type){
-  const folder=type==='image'?'photos':'videos';
   const gallery=document.getElementById(type==='image'?'photoGallery':'videoGallery');
+  const folder=type==='image'?'photos':'videos';
 
-  gallery.innerHTML='<p>正在加载回忆……</p>';
+  if(!currentUser){
+    gallery.innerHTML='<div class="empty">请先进入成员空间登录，才能浏览班级收藏。</div>';
+    return;
+  }
+
+  gallery.innerHTML='<div class="empty">正在整理我们的回忆……</div>';
 
   const {data,error}=await db.storage.from(BUCKET).list(folder,{
-    limit:100,
-    sortBy:{column:'created_at',order:'desc'}
+    limit:100,sortBy:{column:'created_at',order:'desc'}
   });
 
   if(error){
-    gallery.innerHTML='<p>加载失败：'+error.message+'</p>';
+    gallery.textContent='加载失败：'+error.message;
     return;
   }
 
   const files=(data||[]).filter(f=>f.name&&!f.name.startsWith('.'));
 
+  if(type==='image')photoItems=[];
+
   if(!files.length){
-    gallery.innerHTML='<p>这里还没有回忆，等待第一份收藏。</p>';
+    gallery.innerHTML='<div class="empty">这里还没有收藏，等待第一份回忆。</div>';
+    updateFeatured();
     return;
   }
 
@@ -422,42 +765,136 @@ async function loadFiles(type){
 
     if(urlError||!urlData)continue;
 
-    const card=document.createElement('div');
+    const url=urlData.signedUrl;
+    const card=document.createElement('article');
     card.className='media-card';
+
+    const frame=document.createElement('div');
+    frame.className='media-frame';
 
     if(type==='image'){
       const img=document.createElement('img');
-      img.src=urlData.signedUrl;
-      img.alt='班级回忆照片';
+      img.src=url;
+      img.alt='计科2606的照片回忆';
       img.loading='lazy';
-      card.appendChild(img);
+      img.onclick=()=>openModal(url,'image');
+      frame.appendChild(img);
+      photoItems.push({url,name:file.name});
     }else{
       const video=document.createElement('video');
-      video.src=urlData.signedUrl;
+      video.src=url;
       video.controls=true;
       video.preload='metadata';
-      card.appendChild(video);
+      video.playsInline=true;
+      frame.appendChild(video);
+      frame.onclick=()=>openModal(url,'video');
     }
 
-    const caption=document.createElement('p');
-    caption.textContent=file.name;
-    card.appendChild(caption);
+    const caption=document.createElement('div');
+    caption.className='media-caption';
+
+    const name=document.createElement('span');
+    name.textContent=file.name.length>25?file.name.slice(0,22)+'…':file.name;
+
+    const label=document.createElement('small');
+    label.textContent=type==='image'?'PHOTO':'VIDEO';
+
+    caption.append(name,label);
+    card.append(frame,caption);
     gallery.appendChild(card);
+
+    requestAnimationFrame(()=>card.classList.add('visible'));
+  }
+
+  if(type==='image')updateFeatured();
+}
+
+// ====================================
+// ⑥ 首页自动轮播照片
+// ====================================
+function updateFeatured(){
+  const image=document.getElementById('featuredImage');
+  const caption=document.getElementById('featuredCaption');
+
+  if(!photoItems.length){
+    image.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200';
+    caption.textContent='每一段相遇，都值得珍藏。';
+    return;
+  }
+
+  if(slideTimer)clearInterval(slideTimer);
+  slideIndex=0;
+
+  function nextSlide(){
+    const item=photoItems[slideIndex%photoItems.length];
+    image.style.opacity=0;
+
+    setTimeout(()=>{
+      image.src=item.url;
+      caption.textContent=item.name;
+      image.style.opacity=.85;
+    },350);
+
+    slideIndex++;
+  }
+
+  nextSlide();
+  if(photoItems.length>1){
+    slideTimer=setInterval(nextSlide,4500);
   }
 }
 
-// 发布留言
+// ====================================
+// ⑦ 图片和视频放大查看
+// ====================================
+function openModal(url,type){
+  const modal=document.getElementById('mediaModal');
+  const content=document.getElementById('modalContent');
+  content.innerHTML='';
+
+  if(type==='image'){
+    const img=document.createElement('img');
+    img.src=url;
+    content.appendChild(img);
+  }else{
+    const video=document.createElement('video');
+    video.src=url;
+    video.controls=true;
+    video.autoplay=true;
+    video.playsInline=true;
+    content.appendChild(video);
+  }
+
+  modal.classList.add('open');
+}
+
+function closeModal(event){
+  if(event&&event.target!==document.getElementById('mediaModal'))return;
+  const modal=document.getElementById('mediaModal');
+  const video=modal.querySelector('video');
+  if(video)video.pause();
+  modal.classList.remove('open');
+}
+
+// ====================================
+// ⑧ 留言板
+// ====================================
 async function sendMessage(){
-  const name=document.getElementById('messageName').value.trim();
-  const content=document.getElementById('messageText').value.trim();
-
-  if(!name||!content)return alert('请填写昵称和留言内容');
-
   if(!currentUser){
-    alert('请先登录成员账号');
+    toast('请先登录成员账号');
     showPage('member');
     return;
   }
+
+  const name=document.getElementById('messageName').value.trim();
+  const content=document.getElementById('messageText').value.trim();
+  const status=document.getElementById('messageStatus');
+
+  if(!name||!content){
+    status.textContent='请填写昵称和留言内容。';return;
+  }
+
+  status.textContent='正在发布……';
 
   const {error}=await db.from('memory_messages').insert({
     user_id:currentUser.id,
@@ -465,17 +902,25 @@ async function sendMessage(){
     content:content
   });
 
-  if(error)return alert('发布失败：'+error.message);
+  if(error){
+    status.textContent='发布失败：'+error.message;return;
+  }
 
   document.getElementById('messageText').value='';
-  alert('留言成功！');
+  status.textContent='留言成功！';
+  toast('已把你的话收藏起来。');
   loadMessages();
 }
 
-// 读取留言
 async function loadMessages(){
   const list=document.getElementById('messageList');
-  list.innerHTML='<p>正在加载留言……</p>';
+
+  if(!currentUser){
+    list.innerHTML='<div class="empty">请登录后查看和发布班级留言。</div>';
+    return;
+  }
+
+  list.innerHTML='<div class="empty">正在读取留言……</div>';
 
   const {data,error}=await db.from('memory_messages')
     .select('*')
@@ -483,36 +928,46 @@ async function loadMessages(){
     .limit(100);
 
   if(error){
-    list.textContent='留言加载失败：'+error.message;
-    return;
+    list.textContent='读取失败：'+error.message;return;
   }
 
   list.innerHTML='';
 
   if(!data.length){
-    list.textContent='还没有留言，来写下第一句话吧。';
+    list.innerHTML='<div class="empty">还没有留言，来写下第一封信吧。</div>';
     return;
   }
 
   data.forEach(item=>{
-    const box=document.createElement('div');
+    const box=document.createElement('article');
     box.className='message';
+
+    const top=document.createElement('div');
+    top.className='message-top';
 
     const name=document.createElement('strong');
     name.textContent=item.nickname;
 
+    const date=document.createElement('small');
+    date.textContent=new Date(item.created_at).toLocaleDateString('zh-CN');
+
     const content=document.createElement('p');
     content.textContent=item.content;
 
-    const date=document.createElement('small');
-    date.textContent=new Date(item.created_at).toLocaleString('zh-CN');
-
-    box.append(name,content,date);
+    top.append(name,date);
+    box.append(top,content);
     list.appendChild(box);
   });
 }
 
+// ====================================
+// ⑨ 启动
+// ====================================
 refreshUser();
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+});
 </script>
 </body>
 </html>
